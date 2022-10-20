@@ -12,9 +12,19 @@
       "checked": false
     },
     {
-      "id": 3,
-      " checked": false,
-      "item": "Bread"
+      "id": 5,
+      "checked": false,
+      "item": "Cookies"
+    },
+    {
+      "id": 6,
+      "checked": false,
+      "item": "water melon"
+    },
+    {
+      "id": 7,
+      "checked": false,
+      "item": "wine"
     }
   ]
 }
