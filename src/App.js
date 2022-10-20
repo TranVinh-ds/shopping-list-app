@@ -3,28 +3,34 @@ import AddItem from './components/AddItem';
 import SearchItem from './components/SearchItem';
 import Content from './components/Content';
 import Footer from './components/Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      checked: true,
-      item: 'liquor',
-    },
-    {
-      id: 2,
-      checked: false,
-      item: 'bread',
-    },
-    {
-      id: 3,
-      checked: false,
-      item: 'coffee',
-    },
-  ]);
+  const API_URL = 'http://localhost:3500/items';
+  const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [newItem, setNewItem] = useState('');
+  const [fetchError, setFetchError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw Error('Your requested data does not exist');
+        const data = await response.json();
+        setItems(data);
+        setFetchError(null);
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    setTimeout(() => {
+      fetchItems();
+    }, 2000);
+  }, []);
 
   const handleClickCheck = (id) => {
     const listItems = items.map((item) =>
@@ -57,13 +63,23 @@ function App() {
         setNewItem={setNewItem}
       />
       <SearchItem search={search} setSearch={setSearch} />
-      <Content
-        items={items.filter((item) =>
-          item.item.toLowerCase().includes(search.toLowerCase())
+      <main>
+        {isLoading && <p>Loading items...</p>}
+        {fetchError && (
+          <p
+            style={{ marginTop: '2rem', color: 'red' }}
+          >{`Error: ${fetchError}`}</p>
         )}
-        handleClickCheck={handleClickCheck}
-        handleClickDelete={handleClickDelete}
-      />
+        {!fetchError && !isLoading && (
+          <Content
+            items={items.filter((item) =>
+              item.item.toLowerCase().includes(search.toLowerCase())
+            )}
+            handleClickCheck={handleClickCheck}
+            handleClickDelete={handleClickDelete}
+          />
+        )}
+      </main>
       <Footer length={items.length} />
     </div>
   );
